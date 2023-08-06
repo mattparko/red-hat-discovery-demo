@@ -1,0 +1,35 @@
+---
+- name: Configure EC2 instances
+  hosts: ec2
+  gather_facts: true
+  become: true
+
+  tasks:
+    - name: Add user for Discovery scan
+      user:
+        name: dsc-user
+        password: "{{ lookup('env', 'ADMIN_PASSWORDS') | password_hash('sha512') }}"
+        comment: Red Hat Discovery user
+        shell: /bin/bash
+        state: present
+
+    - name: Add Discovery user to sudoers
+      copy:
+        dest: /etc/sudoers.d/91-discovery-user
+        content: "dsc-user ALL=(ALL) NOPASSWD:ALL"
+        owner: root
+        group: root
+        mode: 0440
+    
+    - name: Enable ssh authentication via password
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: ^PasswordAuthentication
+        line: PasswordAuthentication yes
+      register: ssh_auth_result
+    
+    - name: Restart sshd if config updated
+      service:
+        name: sshd
+        state: restarted
+      when: ssh_auth_result is changed
