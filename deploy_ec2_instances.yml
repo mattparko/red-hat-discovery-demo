@@ -91,6 +91,7 @@
           - proto: tcp
             ports:
               - 22
+              - 9443
             cidr_ip: 0.0.0.0/0
             rule_desc: all
         tags:
@@ -123,7 +124,7 @@
       amazon.aws.ec2_instance:
         key_name: rh-discovery-keypair
         security_group: rh-discovery-sg
-        instance_type: t2.medium
+        instance_type: t2.large
         image_id: "{{ rhel_ami.image_id }}"
         wait: yes
         wait_timeout: 500
@@ -146,7 +147,7 @@
       amazon.aws.ec2_instance:
         key_name: rh-discovery-keypair
         security_group: rh-discovery-sg
-        instance_type: t2.medium
+        instance_type: t2.small
         image_id: "{{ rhel_ami.image_id }}"
         wait: yes
         wait_timeout: 500
