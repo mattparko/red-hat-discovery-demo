@@ -1,0 +1,37 @@
+---
+- name: Manage all EC2 instances from Red Hat Discovery demo
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    project_tag: rh-discovery-demo
+
+  tasks:
+    - name: Fail and exit playbook if action variable not set
+      ansible.builtin.fail:
+        msg: Action is not defined - see README
+      when: action is not defined
+
+    - name: Start all EC2 instances with {{ project_tag }} tag
+      amazon.aws.ec2_instance:
+        state: running
+        filters:
+          "tag:project": "{{ project_tag }}"
+          instance-state-name: ["stopped"]
+      when: action == "start"
+
+    - name: Stop all EC2 instances with {{ project_tag }} tag
+      amazon.aws.ec2_instance:
+        state: stopped
+        filters:
+          "tag:project": "{{ project_tag }}"
+          instance-state-name: ["running"]
+      when: action == "stop"
+
+    - name: Terminate all EC2 instances with {{ project_tag }} tag
+      amazon.aws.ec2_instance:
+        state: absent
+        filters:
+          "tag:project": "{{ project_tag }}"
+      when: action == "delete"

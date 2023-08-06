@@ -29,9 +29,11 @@
    2. Add sources
    3. Execute a scan
 
-### Destroy EC2 instances
-1. Execute `ansible-playbook remove_ec2_instances.yml`
+### Managing EC2 instances
+1. Start all: `ansible-playbook manage_ec2_instances.yml -e action=start`
+2. Stop all: `ansible-playbook manage_ec2_instances.yml -e action=stop`
+3. Delete all: `ansible-playbook manage_ec2_instances.yml -e action=delete`
 
 ### Notes
 1. These playbooks can be run multiple times
-2. Be careful with your password management! The dsc-user password will enable remote and privileged password-based ssh to the EC2 instances
+2. __Be careful with your password management!__ The dsc-user password will enable remote and privileged password-based ssh access to your EC2 instances
