@@ -6,7 +6,7 @@
     ```
     export AWS_ACCESS_KEY_ID=myaccesskeyid
     export AWS_SECRET_ACCESS_KEY=mysecretaccesskey
-    export AWS_REGION=ap-southeast-1
+    export AWS_REGION=ap-southeast-2
     ```
 3. Install Ansible dependencies on control node
    - ansible-core 2.14
