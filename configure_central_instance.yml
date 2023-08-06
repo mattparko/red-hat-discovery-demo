@@ -5,7 +5,7 @@
   become: true
 
   vars:
-    dsc_password: 1800redhat
+    dsc_password: "{{ lookup('env', 'ADMIN_PASSWORDS') }}"
 
   tasks:
     - name: Create filesystem
@@ -95,21 +95,4 @@
           QPC_SERVER_USER_EMAIL: admin@example.com
         state: started
 
-    # - name: Create a new toolbox container
-    #   containers.podman.podman_container:
-    #         name: toolbox
-    #         pod: toolbox
-    #         image: registry.redhat.io/rhel8/redhat-rhui-agent:latest
-    #         restart_policy: on-failure
-    #         volume:
-    #           - /var/discovery/agent/automation/agent.json:/etc/redhat/agent/agent.json:z
-    #           - /var/discovery/agent/automation/target.db:/etc/redhat/target.db:z
-    #         env:
-    #           REDHAT_USERNAME: "{{ rhn_username }}"
-    #           REDHAT_PASSWORD: "{{ _redhat_password_ }}"
-    #           REDHAT_DNS_URL: "{{ dns_url }}"
-    #           REDHAT_AUTH_SOCKET: /var/run/ovirt-engine/ovirt-engine-discovery-agent.sock
-    #           REDHAT_HTTP_HOST: https://{{ rhn_server_hostname }}:443/ovirt-engine/api
-
     # TODO - checkout Discovery CLI: https://access.redhat.com/documentation/en-us/subscription_central/2023/html-single/installing_and_configuring_discovery/index#assembly-installing-command-line-interface-inst
-
