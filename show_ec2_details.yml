@@ -21,4 +21,28 @@
           # Other EC2 Instances
           #######################
 
-          TODO
+          EC2 Instances:
+          {% for instance in ec2_instances.instances %}
+            - Internal: {{ instance.private_ip_address }} | External: {{ instance.public_ip_address }}
+          {% endfor %}
+
+          #######################
+          # Red Hat Discovery Tool
+          #######################
+
+          The Red Hat Discovery GUI can be found at:
+            https://{{ central_instance.instances.0.public_dns_name }}:9443
+            Username: admin
+            Password: Set by env variable ADMIN_PASSWORDS
+
+          To add a credential for the EC2 instances, use the following info:
+            Username: dsc-user
+            Password: Set by env variable ADMIN_PASSWORDS
+
+          The following network ranges can be added as sources:
+          {% for subnet in central_subnet.subnets %}
+            {{ subnet.cidr_block }}
+          {% endfor %}
+          {% for subnet in vpc_subnets.subnets %}
+            {{ subnet.cidr_block }}
+          {% endfor %}
