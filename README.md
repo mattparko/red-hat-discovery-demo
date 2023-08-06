@@ -1,5 +1,8 @@
 ## Set up a Red Hat Discovery demo / test lab
 
+### Passwords
+TODO: note on Discovery tool passwords
+
 ### Prereqs
 1. Deploy an "AWS Blank Open Environment" in RHPDS (under Red Hat Open Environments)
 2. Export the following environment variables (add your credentials and update region as needed)
@@ -7,6 +10,8 @@
     export AWS_ACCESS_KEY_ID=myaccesskeyid
     export AWS_SECRET_ACCESS_KEY=mysecretaccesskey
     export AWS_REGION=ap-southeast-2
+    export REGISTRY_USER=my_registry_redhat_io_user
+    export REGISTRY_PASS=my_registry_redhat_io_password
     ```
 3. Install Ansible dependencies on control node
    - ansible-core 2.14

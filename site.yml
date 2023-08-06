@@ -1,0 +1,4 @@
+---
+- import_playbook: deploy_ec2_instances.yml
+- import_playbook: configure_central_instance.yml
+- import_playbook: show_ec2_details.yml

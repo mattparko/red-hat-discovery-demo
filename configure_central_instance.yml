@@ -1,0 +1,115 @@
+---
+- name: Configure central / discovery instance
+  hosts: central
+  gather_facts: true
+  become: true
+
+  vars:
+    dsc_password: 1800redhat
+
+  tasks:
+    - name: Create filesystem
+      community.general.filesystem:
+        fstype: xfs
+        dev: /dev/xvdb
+    
+    - name: Create discovery folder
+      file:
+        path: /var/discovery/server/volumes
+        state: directory
+        mode: '0755'
+
+    - name: Mount filesystem
+      ansible.posix.mount:
+        path: /var/discovery/server/volumes
+        src: /dev/xvdb
+        fstype: xfs
+        state: mounted
+    
+    - name: Create discovery subfolders
+      file:
+        path: /var/discovery/server/volumes/{{ item }}
+        state: directory
+        mode: '0755'
+      loop:
+        - data
+        - log
+        - sshkeys
+
+    - name: Install dependencies
+      package:
+        name:
+          - podman
+          - toolbox
+        state: present        
+
+    - name: Log in to registry.redhat.io container registry
+      containers.podman.podman_login:
+        username: "{{ lookup('env', 'REGISTRY_USER') }}"
+        password: "{{ lookup('env', 'REGISTRY_PASS') }}"
+        registry: registry.redhat.io
+
+    - name: Create a podman pod
+      containers.podman.podman_pod:
+        name: discovery-pod
+        state: started
+        publish:
+          - 9443:443
+
+    - name: Create database container for Red Hat Discovery tool
+      containers.podman.podman_container:
+        name: dsc-db
+        pod: discovery-pod
+        image: registry.redhat.io/rhel8/postgresql-12:latest
+        restart_policy: on-failure
+        volume:
+          - dsc-data:/var/lib/pgsql/data
+        env:
+          POSTGRESQL_USER: dsc
+          POSTGRESQL_PASSWORD: "{{ dsc_password }}"
+          POSTGRESQL_DATABASE: dsc-db
+        state: started
+
+    - name: Create database container for Red Hat Discovery tool
+      containers.podman.podman_container:
+        name: discovery
+        pod: discovery-pod
+        image: registry.redhat.io/discovery/discovery-server-rhel8:latest
+        restart_policy: on-failure
+        volume:
+          - /var/discovery/server/volumes/data/:/var/data:z
+          - /var/discovery/server/volumes/log/:/var/log:z
+          - /var/discovery/server/volumes/sshkeys/:/sshkeys:z
+        env:
+          DJANGO_DEBUG: False
+          NETWORK_CONNECT_JOB_TIMEOUT: 60
+          NETWORK_INSPECT_JOB_TIMEOUT: 600
+          PRODUCTION: True
+          QPC_DBMS_HOST: localhost
+          QPC_DBMS_PASSWORD: "{{ dsc_password }}"
+          QPC_DBMS_USER: dsc
+          QPC_DBMS_DATABASE: dsc-db
+          QPC_SERVER_PASSWORD: "{{ dsc_password }}"
+          QPC_SERVER_TIMEOUT: 120
+          QPC_SERVER_USERNAME: admin
+          QPC_SERVER_USER_EMAIL: admin@example.com
+        state: started
+
+    # - name: Create a new toolbox container
+    #   containers.podman.podman_container:
+    #         name: toolbox
+    #         pod: toolbox
+    #         image: registry.redhat.io/rhel8/redhat-rhui-agent:latest
+    #         restart_policy: on-failure
+    #         volume:
+    #           - /var/discovery/agent/automation/agent.json:/etc/redhat/agent/agent.json:z
+    #           - /var/discovery/agent/automation/target.db:/etc/redhat/target.db:z
+    #         env:
+    #           REDHAT_USERNAME: "{{ rhn_username }}"
+    #           REDHAT_PASSWORD: "{{ _redhat_password_ }}"
+    #           REDHAT_DNS_URL: "{{ dns_url }}"
+    #           REDHAT_AUTH_SOCKET: /var/run/ovirt-engine/ovirt-engine-discovery-agent.sock
+    #           REDHAT_HTTP_HOST: https://{{ rhn_server_hostname }}:443/ovirt-engine/api
+
+    # TODO - checkout Discovery CLI: https://access.redhat.com/documentation/en-us/subscription_central/2023/html-single/installing_and_configuring_discovery/index#assembly-installing-command-line-interface-inst
+

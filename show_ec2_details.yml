@@ -1,0 +1,24 @@
+---
+- name: Output useful information about the environment
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - debug:
+        msg: |
+          #######################
+          # Central Instance
+          #######################
+
+          Public IP:  {{ central_instance.instances.0.public_ip_address }}
+          Public DNS: {{ central_instance.instances.0.public_dns_name }}
+
+          To access the instance:
+            ssh ec2-user@{{ central_instance.instances.0.public_dns_name }}
+
+          #######################
+          # Other EC2 Instances
+          #######################
+
+          TODO
