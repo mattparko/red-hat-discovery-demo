@@ -1,8 +1,5 @@
 ## Set up a Red Hat Discovery demo / test lab
 
-### Passwords
-TODO: note on Discovery tool passwords
-
 ### Prereqs
 1. Deploy an "AWS Blank Open Environment" in RHPDS (under Red Hat Open Environments)
 2. Export the following environment variables (add your credentials and update region as needed)
@@ -25,9 +22,16 @@ TODO: note on Discovery tool passwords
    ```
 5. Ensure you have a public ssh key located at `~/.ssh/id_rsa.pub`
 
-### Deploy
+### Deploy and configure Red Hat Discovery
 1. Execute `ansible-playbook site.yml`
+2. Log in to Red Hat Discovery GUI
+   1. Add credentials
+   2. Add sources
+   3. Execute a scan
+
+### Destroy EC2 instances
+1. Execute `ansible-playbook remove_ec2_instances.yml`
 
 ### Notes
-1. This playbook can be run multiple times
-2. You can start/stop your EC2 instances with the provided playbooks
+1. These playbooks can be run multiple times
+2. Be careful with your password management! The dsc-user password will enable remote and privileged password-based ssh to the EC2 instances
