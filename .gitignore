@@ -1,2 +1,4 @@
 aws_details
 env_vars
+gh_deploy_key
+gh_deploy_key.pub
