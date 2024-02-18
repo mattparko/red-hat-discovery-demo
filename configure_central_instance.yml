@@ -12,9 +12,9 @@
       community.general.filesystem:
         fstype: xfs
         dev: /dev/xvdb
-    
+
     - name: Create discovery folder
-      file:
+      ansible.builtin.file:
         path: /var/discovery/server/volumes
         state: directory
         mode: '0755'
@@ -25,9 +25,9 @@
         src: /dev/xvdb
         fstype: xfs
         state: mounted
-    
+
     - name: Create discovery subfolders
-      file:
+      ansible.builtin.file:
         path: /var/discovery/server/volumes/{{ item }}
         state: directory
         mode: '0755'
@@ -37,11 +37,11 @@
         - sshkeys
 
     - name: Install dependencies
-      package:
+      ansible.builtin.package:
         name:
           - podman
           - toolbox
-        state: present        
+        state: present
 
     - name: Log in to registry.redhat.io container registry
       containers.podman.podman_login:
@@ -94,5 +94,17 @@
           QPC_SERVER_USERNAME: admin
           QPC_SERVER_USER_EMAIL: admin@example.com
         state: started
+
+    - name: Generate systemd unit file for the Discovery pod
+      containers.podman.podman_generate_systemd:
+        name: discovery-pod
+        dest: /etc/systemd/system
+
+    - name: Ensure Discovery pod is started and enabled
+      ansible.builtin.systemd:
+        name: pod-discovery-pod
+        daemon_reload: true
+        state: started
+        enabled: true
 
     # TODO - checkout Discovery CLI: https://access.redhat.com/documentation/en-us/subscription_central/2023/html-single/installing_and_configuring_discovery/index#assembly-installing-command-line-interface-inst
