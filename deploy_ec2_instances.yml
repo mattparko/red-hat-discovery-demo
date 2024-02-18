@@ -182,10 +182,10 @@
           instance-state-name: ["running"]
       register: ec2_instances
 
-    - name: Add all instances to ec2 host group
+    - name: Add all instances to host group
       ansible.builtin.add_host:
         hostname: "{{ item.public_ip_address }}"
-        groupname: ec2
+        groupname: all_instances
       loop: "{{ ec2_instances.instances }}"
       loop_control:
         label: "{{ item.public_ip_address }}"
@@ -193,7 +193,7 @@
     - name: Add central instance to central host group
       ansible.builtin.add_host:
         hostname: "{{ central_instance.instances.0.public_ip_address }}"
-        groupname: central
+        groupname: central_instance
 
     - name: Wait for all instances to finish provisioning
       ansible.builtin.wait_for:

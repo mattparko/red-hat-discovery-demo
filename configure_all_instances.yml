@@ -1,6 +1,6 @@
 ---
 - name: Configure EC2 instances
-  hosts: ec2
+  hosts: all_instances
   gather_facts: true
   become: true
 

@@ -1,6 +1,6 @@
 ---
 - name: Configure central / discovery instance
-  hosts: central
+  hosts: central_instance
   gather_facts: true
   become: true
 
