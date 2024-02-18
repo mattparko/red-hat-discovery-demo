@@ -5,7 +5,7 @@
   gather_facts: false
 
   tasks:
-    - debug:
+    - ansible.builtin.debug:
         msg: |
           #######################
           # Central Instance

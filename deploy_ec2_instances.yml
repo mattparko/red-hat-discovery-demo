@@ -116,7 +116,7 @@
       register: amis
 
     - name: Set AMI facts
-      set_fact:
+      ansible.builtin.set_fact:
         rhel_ami: >
           {{ amis.images | selectattr('name', 'defined') | sort(attribute='creation_date') | last }}
 
@@ -164,7 +164,7 @@
       register: ec2_instance_result
 
     - name: Give instances a chance to start
-      pause:
+      ansible.builtin.pause:
         seconds: 30
       when: ec2_instance_result is changed
 
@@ -183,7 +183,7 @@
       register: ec2_instances
 
     - name: Add all instances to ec2 host group
-      add_host:
+      ansible.builtin.add_host:
         hostname: "{{ item.public_ip_address }}"
         groupname: ec2
       loop: "{{ ec2_instances.instances }}"
@@ -191,12 +191,12 @@
         label: "{{ item.public_ip_address }}"
 
     - name: Add central instance to central host group
-      add_host:
+      ansible.builtin.add_host:
         hostname: "{{ central_instance.instances.0.public_ip_address }}"
         groupname: central
 
     - name: Wait for all instances to finish provisioning
-      wait_for:
+      ansible.builtin.wait_for:
         host: "{{ item.public_ip_address }}"
         port: 22
       loop: "{{ ec2_instances.instances }}"
